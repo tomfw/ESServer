@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "DatabaseManager.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    [[DatabaseManager manager] setTestDatabase:@"/Users/tomfw/Desktop/ExpenseShare.db"];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
