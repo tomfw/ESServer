@@ -81,6 +81,18 @@
         } else {
             NSLog(@"Transactions from another period have been requested");
         }
+    } else if(packet.code == ESPACKET_REQUEST_USERS) {
+        NSLog(@"Client requested some users");
+        NSArray *users = [manager loadObjectsWithTemplate:[User userWithID:0]];
+        if(users)
+            NSLog(@"Found %ld users", users.count);
+        [[ESPacket packetWithCode:ESPACKET_ALL_USERS object:users] sendOnSocket:self.socket withTimeOut:30];
+        [ESPacket readOnSocket:self.socket withTimeOut:60];
+    } else if(packet.code == ESPACKET_ADD_GROUP_MEMBER) {
+        User_Group *ug = packet.object;
+        [manager insertObject:ug];
+        [[ESPacket packetWithCode:ESPACKET_OK object:nil] sendOnSocket:self.socket withTimeOut:30];
+        [ESPacket readOnSocket:self.socket withTimeOut:60];
     } else if (packet.code == ESPACKET_OK) {
         NSLog(@"We're alive!");
         [ESPacket readOnSocket:self.socket withTimeOut:60];

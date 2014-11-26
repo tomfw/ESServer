@@ -48,7 +48,6 @@
 -(NSArray*)loadObjects {
     NSArray *columns = [self columnsWithValues];
     NSArray *values = [self valuesForColumns:columns];
-    NSLog(@"%@ columns, %@values", columns, values);
     return [self loadObjectsOfType:[self.object class]
                          fromTable:self.object.tableName
                       whereColumns:columns
@@ -98,14 +97,18 @@
 
 -(NSArray *)loadObjectsOfType:(Class)dbObject fromTable:(NSString*)table whereColumns:(NSArray *)columns haveValues:(NSArray *)values {
     NSMutableArray *objects = [NSMutableArray arrayWithCapacity:10];
-    NSString *selector = [NSString stringWithFormat:@"SELECT * FROM %@ WHERE ", table];
-
-    selector = [selector stringByAppendingString:[self whereClauseForColumns:columns]];
+    NSString *selector = [NSString stringWithFormat:@"SELECT * FROM %@", table];
+    if(columns.count == 0) { // no columns set so load all objects
+        selector = [selector stringByAppendingString:@";"];
+    } else {
+        selector = [selector stringByAppendingString:@" WHERE "];
+        selector = [selector stringByAppendingString:[self whereClauseForColumns:columns]];
+    }
     self.results = [[DatabaseManager manager] executeSelect:selector withArgs:values];
-  //  NSLog(@"Selector: %@ values %@",selector, values);
+    //  NSLog(@"Selector: %@ values %@",selector, values);
     while ([self.results next]) {
-        id  obj = [dbObject alloc];
-        id<DBCoding> codableObject = [obj initWithDBCoder:self];//TODO: double check this b.s. stopped working and needed this ugly hack.
+        id            obj = [dbObject alloc];
+        id <DBCoding> codableObject = [obj initWithDBCoder:self];//TODO: double check this b.s. stopped working and needed this ugly hack.
         [objects addObject:codableObject];
     }
     return [objects copy];
