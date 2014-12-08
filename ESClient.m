@@ -93,6 +93,14 @@
         [manager insertObject:ug];
         [[ESPacket packetWithCode:ESPACKET_OK object:nil] sendOnSocket:self.socket withTimeOut:30];
         [ESPacket readOnSocket:self.socket withTimeOut:60];
+    } else if(packet.code == ESPACKET_DELETE_OBJECT) {
+        id<DBCoding> obj = (id <DBCoding>) packet.object;
+        NSLog(@"User requested to delete an object!");
+        [manager deleteObject:obj];
+        [ESPacket readOnSocket:self.socket withTimeOut:60];
+    } else if (packet.code == ESPACKET_UPDATE_OBJECT) {
+        [manager updateObject:(id <DBCoding>) packet.object];
+        [ESPacket readOnSocket:self.socket withTimeOut:60];
     } else if (packet.code == ESPACKET_OK) {
         NSLog(@"We're alive!");
         [ESPacket readOnSocket:self.socket withTimeOut:60];
